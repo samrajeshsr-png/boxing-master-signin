@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BOXING MASTER ACCESS</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f8;
+      text-align: center;
+      padding: 60px 15px;
+    }
+    .panel {
+      background: white;
+      max-width: 440px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px #ccc;
+    }
+    h2 { color: #17365d; }
+    #status { margin-top: 25px; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2>BOXING MASTER ACCESS</h2>
+    <p>Please sign in with your Google account.</p>
+
+    <div id="g_id_onload"
+      data-client_id="1097622282163-1he3845bv4f1s5uan3dvrcbn9v5ir7jm.apps.googleusercontent.com"
+      data-callback="handleGoogleSignIn">
+    </div>
+
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="signin_with"
+      data-shape="rectangular">
+    </div>
+
+    <div id="status">Waiting for Google sign-in...</div>
+  </div>
+
+  <script>
+    function handleGoogleSignIn(response) {
+      document.getElementById("status").textContent =
+        "Google sign-in successful. Preparing access verification...";
+    }
+  </script>
+</body>
+</html>
