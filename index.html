@@ -47,9 +47,31 @@
   </div>
 
   <script>
-    function handleGoogleSignIn(response) {
-      document.getElementById("status").textContent =
-        "Google sign-in successful. Preparing access verification...";
+   
+function handleGoogleSignIn(response) {
+  const status = document.getElementById("status");
+  status.textContent = "Google sign-in received. Checking B14 permission...";
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "https://script.google.com/macros/s/AKfycbxWk1oOjmyt6Mv0Q7V7CbU4qa86812rP1cR9TsOepXAXzZ3qLd5pCl0g5ex2MekHczq/exec";
+
+  const token = document.createElement("input");
+  token.type = "hidden";
+  token.name = "idToken";
+  token.value = response.credential;
+  form.appendChild(token);
+
+  const wb = document.createElement("input");
+  wb.type = "hidden";
+  wb.name = "workbook";
+  wb.value = "B14";
+  form.appendChild(wb);
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
     }
   </script>
 </body>
