@@ -48,9 +48,19 @@
 
   <script>
    
+
 function handleGoogleSignIn(response) {
-  alert("GOOGLE CALLBACK WORKING");
   const status = document.getElementById("status");
+
+  const params = new URLSearchParams(window.location.search);
+  const challenge = params.get("challenge") || "";
+  const workbook = (params.get("workbook") || "").toUpperCase();
+
+  if (!challenge || workbook !== "B14") {
+    status.textContent = "Invalid or missing Excel login challenge.";
+    return;
+  }
+
   status.textContent = "Google sign-in received. Checking B14 permission...";
 
   const form = document.createElement("form");
@@ -66,12 +76,16 @@ function handleGoogleSignIn(response) {
   const wb = document.createElement("input");
   wb.type = "hidden";
   wb.name = "workbook";
-  wb.value = "B14";
+  wb.value = workbook;
   form.appendChild(wb);
+
+  const ch = document.createElement("input");
+  ch.type = "hidden";
+  ch.name = "challenge";
+  ch.value = challenge;
+  form.appendChild(ch);
 
   document.body.appendChild(form);
   form.submit();
 }
-  </script>
-</body>
-</html>
+
