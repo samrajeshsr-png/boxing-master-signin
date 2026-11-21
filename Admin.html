@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *{box-sizing:border-box} body{margin:0;padding:22px;background:#f2f4f8;font-family:Arial,sans-serif;color:#202124}
+    .panel{max-width:760px;margin:18px auto;background:#fff;padding:24px;border-radius:14px;box-shadow:0 3px 18px #0002}
+    h1{text-align:center;color:#45218a;margin:4px 0}.sub{text-align:center;color:#666;margin:0 0 22px}
+    label{display:block;font-weight:bold;margin:14px 0 6px}input,select{width:100%;padding:12px;border:1px solid #c7c7c7;border-radius:7px;font-size:16px}
+    button{padding:12px 16px;border:0;border-radius:7px;background:#673ab7;color:#fff;font-weight:bold;cursor:pointer}
+    button.secondary{background:#5f6368}button.danger{background:#c5221f}button:disabled{opacity:.5;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    #message{margin-top:15px;font-weight:bold;min-height:22px}.hidden{display:none}.tablewrap{overflow:auto;margin-top:18px}
+    table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left;white-space:nowrap}th{background:#f3effa}
+    .signin{text-align:center;padding:18px}.small{font-size:12px;color:#666}@media(max-width:560px){.grid{grid-template-columns:1fr}.panel{padding:17px}}
+  </style>
+</head>
+<body>
+<div class="panel">
+  <h1>BOXING MASTER</h1><p class="sub">ADMINISTRATOR ACCESS PANEL</p>
+  <div id="signin" class="signin">
+    <p>Sign in with the administrator Google account.</p>
+    <button onclick="startSignIn()">SIGN IN WITH GOOGLE</button>
+    <p class="small">Google sign-in opens in a separate window.</p>
+  </div>
+  <div id="app" class="hidden">
+    <p>Signed in: <b id="adminEmail">Administrator</b></p>
+    <label>Teacher's Gmail Address</label><input id="gmail" type="email" placeholder="Enter teacher@gmail.com">
+    <div class="grid">
+      <div><label>Workbook</label><select id="workbook"><option>B14</option><option>B17</option><option>B19</option></select></div>
+      <div><label>Permission Duration</label><select id="days"><option value="1">1 Day</option><option value="2">2 Days</option><option value="3">3 Days</option></select></div>
+    </div>
+    <label>Remarks (optional)</label><input id="remarks" type="text" placeholder="Event / purpose">
+    <div class="actions"><button onclick="grant()">GRANT ACCESS</button><button class="danger" onclick="revoke()">REVOKE ACCESS</button><button class="secondary" onclick="refreshList()">REFRESH LIST</button></div>
+    <div id="message" role="status"></div>
+    <h3>ACCESS RECORDS</h3><div class="tablewrap"><table><thead><tr><th>Gmail</th><th>Workbook</th><th>Status</th><th>Expiry</th><th>Remarks</th></tr></thead><tbody id="records"><tr><td colspan="5">Loading...</td></tr></tbody></table></div>
+    <p class="small">Access is controlled separately for B14, B17 and B19. Revoking one workbook does not affect the others.</p>
+  </div>
+</div>
+<script>
+  const AUTH_ORIGIN = "https://samrajeshsr-png.github.io";
+  const AUTH_PAGE = AUTH_ORIGIN + "/boxing-master-signin/admin-auth.html";
+  let adminToken = "";
+  let authWindow = null;
+
+  function startSignIn(){
+    authWindow = window.open(AUTH_PAGE, "BOXING_MASTER_ADMIN_SIGNIN", "popup,width=520,height=650");
+    if(!authWindow) showMessage("Please allow pop-ups for this page, then try again.", true);
+    else showMessage("Complete Google sign-in in the new window...");
+  }
+
+  window.addEventListener("message", function(event){
+    if(event.origin !== AUTH_ORIGIN || event.source !== authWindow) return;
+    const data = event.data || {};
+    if(data.type !== "BOXING_MASTER_ADMIN_AUTH" || !data.credential) return;
+    adminToken = String(data.credential);
+    if(authWindow && !authWindow.closed) authWindow.close();
+    document.getElementById("signin").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("adminEmail").textContent = "Google account verified by server";
+    refreshList();
+  });
+
+  function showMessage(t,bad){const el=document.getElementById("message");el.textContent=t;el.style.color=bad?"#c5221f":"#188038";}
+  function getInputs(){return {gmail:document.getElementById("gmail").value.trim(),workbook:document.getElementById("workbook").value};}
+  function grant(){
+    const v=getInputs(); if(!v.gmail){showMessage("Enter the teacher's Gmail address.",true);return;}
+    showMessage("Granting access...");
+    google.script.run.withSuccessHandler(r=>{showMessage(r);refreshList();}).withFailureHandler(e=>showMessage(e.message,true))
+      .adminGrantAccessWithToken(adminToken,v.gmail,v.workbook,document.getElementById("days").value,document.getElementById("remarks").value.trim());
+  }
+  function revoke(){
+    const v=getInputs(); if(!v.gmail){showMessage("Enter the teacher's Gmail address.",true);return;}
+    if(!confirm("Revoke "+v.workbook+" access for "+v.gmail+"?"))return;
+    showMessage("Revoking access...");
+    google.script.run.withSuccessHandler(r=>{showMessage(r);refreshList();}).withFailureHandler(e=>showMessage(e.message,true))
+      .adminRevokeAccessWithToken(adminToken,v.gmail,v.workbook);
+  }
+  function refreshList(){
+    google.script.run.withSuccessHandler(rows=>{
+      const body=document.getElementById("records");body.innerHTML="";
+      if(!rows.length){body.innerHTML='<tr><td colspan="5">No access records yet.</td></tr>';return;}
+      rows.forEach(r=>{const tr=document.createElement("tr");[r.gmail,r.workbook,r.status,r.expiry,r.remarks].forEach(v=>{const td=document.createElement("td");td.textContent=v||"";tr.appendChild(td);});body.appendChild(tr);});
+    }).withFailureHandler(e=>showMessage(e.message,true)).adminListAccessWithToken(adminToken);
+  }
+</script>
+</body></html>
