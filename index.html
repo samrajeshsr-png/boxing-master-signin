@@ -47,47 +47,46 @@
   </div>
 
   <script>
-   
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script>
-function handleGoogleSignIn(response) {
-    alert("GOOGLE CALLBACK WORKING");
-  const status = document.getElementById("status");
+    function handleGoogleSignIn(response) {
+      alert("GOOGLE CALLBACK WORKING");
 
-  const params = new URLSearchParams(window.location.search);
-  const challenge = params.get("challenge") || "";
-  const workbook = (params.get("workbook") || "").toUpperCase();
+      const status = document.getElementById("status");
+      const params = new URLSearchParams(window.location.search);
+      const challenge = params.get("challenge") || "";
+      const workbook = (params.get("workbook") || "").toUpperCase();
 
-  if (!challenge || workbook !== "B14") {
-    status.textContent = "Invalid or missing Excel login challenge.";
-    return;
-  }
+      if (!challenge || workbook !== "B14") {
+        status.textContent = "Invalid or missing Excel login challenge.";
+        return;
+      }
 
-  status.textContent = "Google sign-in received. Checking B14 permission...";
+      status.textContent = "Google sign-in received. Checking B14 permission...";
 
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = "https://script.google.com/macros/s/AKfycbxWk1oOjmyt6Mv0Q7V7CbU4qa86812rP1cR9TsOepXAXzZ3qLd5pCl0g5ex2MekHczq/exec";
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://script.google.com/macros/s/AKfycbxWk1oOjmyt6Mv0Q7V7CbU4qa86812rP1cR9TsOepXAXzZ3qLd5pCl0g5ex2MekHczq/exec";
 
-  const token = document.createElement("input");
-  token.type = "hidden";
-  token.name = "idToken";
-  token.value = response.credential;
-  form.appendChild(token);
+      const token = document.createElement("input");
+      token.type = "hidden";
+      token.name = "idToken";
+      token.value = response.credential;
+      form.appendChild(token);
 
-  const wb = document.createElement("input");
-  wb.type = "hidden";
-  wb.name = "workbook";
-  wb.value = workbook;
-  form.appendChild(wb);
+      const wb = document.createElement("input");
+      wb.type = "hidden";
+      wb.name = "workbook";
+      wb.value = workbook;
+      form.appendChild(wb);
 
-  const ch = document.createElement("input");
-  ch.type = "hidden";
-  ch.name = "challenge";
-  ch.value = challenge;
-  form.appendChild(ch);
+      const ch = document.createElement("input");
+      ch.type = "hidden";
+      ch.name = "challenge";
+      ch.value = challenge;
+      form.appendChild(ch);
 
-  document.body.appendChild(form);
-  form.submit();
-}
-</script>
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
+</body>
+</html>
