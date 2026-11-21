@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BOXING MASTER - Administrator Sign-in</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f2f4f8;text-align:center;padding:55px 15px;color:#202124}
+    .panel{background:#fff;max-width:440px;margin:auto;padding:30px;border-radius:12px;box-shadow:0 2px 12px #ccc}
+    h2{color:#45218a}#status{margin-top:22px;line-height:1.5}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2>BOXING MASTER</h2>
+    <p>Administrator Google sign-in</p>
+    <div id="g_id_onload"
+      data-client_id="1097622282163-1he3845bv4f1s5uan3dvrcbn9v5ir7jm.apps.googleusercontent.com"
+      data-callback="handleAdminSignIn"
+      data-auto_prompt="false"></div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular"></div>
+    <div id="status">Waiting for Google sign-in...</div>
+  </div>
+  <script>
+    function handleAdminSignIn(response){
+      const status = document.getElementById("status");
+      if(!response || !response.credential){status.textContent="Google sign-in did not return a credential. Please try again.";return;}
+      if(!window.opener){status.textContent="Please open this page using the SIGN IN WITH GOOGLE button on the Admin Dashboard.";return;}
+      status.textContent="Sign-in received. Returning securely to the Admin Dashboard...";
+      window.opener.postMessage({type:"BOXING_MASTER_ADMIN_AUTH",credential:response.credential}, "*");
+    }
+  </script>
+</body>
+</html>
