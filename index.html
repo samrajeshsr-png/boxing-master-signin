@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BOXING MASTER ACCESS</title>
+  <script src="https://accounts.google.com/gsi/client" defer></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -48,6 +49,7 @@
   <script>
    
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
 function handleGoogleSignIn(response) {
     alert("GOOGLE CALLBACK WORKING");
   const status = document.getElementById("status");
@@ -88,4 +90,4 @@ function handleGoogleSignIn(response) {
   document.body.appendChild(form);
   form.submit();
 }
-
+</script>
